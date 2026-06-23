@@ -1,7 +1,7 @@
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #172033;
-  background: #f5f7fb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #f6f8ff;
+  background: #020208;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,13 +12,19 @@
   box-sizing: border-box;
 }
 
-body {
-  display: flex;
-  justify-content: center;
+html,
+body,
+#app {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
+  background: #020208;
+}
+
+body {
   min-width: 320px;
   min-height: 100vh;
-  background: #e8edf5;
+  overflow-x: hidden;
 }
 
 button,
@@ -28,42 +34,20 @@ textarea {
 }
 
 .app-shell {
-  /* 移动端页面最大宽度控制，桌面预览时居中展示。 */
   width: 100%;
   max-width: 450px;
   min-height: 100vh;
   margin: 0 auto;
-  background: #f5f7fb;
-  box-shadow: 0 0 32px rgba(23, 32, 51, 0.08);
+  background: #020208;
+  overflow-x: hidden;
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.22);
 }
 
 .page {
   min-height: 100vh;
-  padding: 16px;
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
 }
 
-.page-title {
-  margin: 16px 0 8px;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.page-subtitle {
-  margin: 0 0 18px;
-  color: #68738a;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.section {
-  margin-top: 16px;
-}
-
 .panel {
-  border: 1px solid #e7ebf3;
   border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
 }

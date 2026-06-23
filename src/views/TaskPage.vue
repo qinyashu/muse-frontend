@@ -61,11 +61,7 @@ async function loadStatus() {
 }
 
 function downloadVideo() {
-  if (!outputUrl.value) {
-    return
-  }
-
-  // 使用临时 a 标签触发下载；跨域文件可能由浏览器改为新窗口打开。
+  if (!outputUrl.value) return
   const link = document.createElement('a')
   link.href = outputUrl.value
   link.download = `task-${taskId.value}.mp4`
@@ -75,7 +71,6 @@ function downloadVideo() {
 }
 
 onMounted(() => {
-  // 首次进入立即查询，随后每 2 秒轮询一次。
   loadStatus()
   timer = window.setInterval(loadStatus, 2000)
 })
@@ -87,73 +82,187 @@ onUnmounted(() => {
 
 <template>
   <div class="page task-page">
-    <van-nav-bar title="任务详情" left-arrow @click-left="router.back()" />
+    <van-nav-bar class="dark-nav" title="任务详情" left-arrow @click-left="router.back()" />
 
-    <section class="panel task-panel">
-      <div class="task-id">任务 #{{ taskId }}</div>
-      <h1 class="page-title">{{ statusText }}</h1>
+    <section class="task-hero panel neon-panel">
+      <div class="task-head">
+        <div class="task-id">任务 #{{ taskId }}</div>
+        <div class="refresh-badge">⟳</div>
+      </div>
+      <h1 class="task-title">{{ statusText }}</h1>
+      <p class="task-subtitle">{{ isPolling ? '正在刷新状态...' : '状态会自动更新' }}</p>
 
       <van-progress
         v-if="status === 'queued' || status === 'processing'"
+        class="task-progress"
         :percentage="progress"
-        stroke-width="8"
+        stroke-width="10"
+        track-color="rgba(46, 52, 81, 0.92)"
       />
 
-      <p class="page-subtitle">
-        {{ isPolling ? '正在刷新状态...' : '状态会自动更新' }}
-      </p>
+      <div class="task-status-block">
+        <span class="status-dot" :class="status"></span>
+        <span>{{ status === 'done' ? '已完成' : status === 'failed' ? '已失败' : '进行中' }}</span>
+      </div>
     </section>
 
-    <section v-if="status === 'done' && outputUrl" class="panel video-panel">
-      <video :src="outputUrl" controls playsinline preload="metadata"></video>
-      <van-button class="download-button" block type="primary" @click="downloadVideo">
+    <section v-if="status === 'done' && outputUrl" class="panel neon-panel video-panel">
+      <div class="video-frame">
+        <video :src="outputUrl" controls playsinline preload="metadata"></video>
+      </div>
+      <van-button class="download-button" block round type="primary" @click="downloadVideo">
         下载视频
       </van-button>
     </section>
 
-    <van-empty v-if="status === 'failed'" description="生成失败，请重试">
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      <van-button round type="primary" to="/">重新创建</van-button>
-    </van-empty>
+    <section v-if="status === 'failed'" class="panel neon-panel fail-panel">
+      <div class="fail-title">生成失败，请重试</div>
+      <p v-if="errorMessage" class="fail-message">{{ errorMessage }}</p>
+      <van-button round type="primary" to="/">返回首页</van-button>
+    </section>
   </div>
 </template>
 
 <style scoped>
 .task-page {
-  padding-top: 0;
+  min-height: 100dvh;
+  padding: 0 16px 24px;
+  background:
+    radial-gradient(circle at top right, rgba(92, 56, 255, 0.2), transparent 22%),
+    radial-gradient(circle at top left, rgba(0, 210, 255, 0.12), transparent 20%),
+    linear-gradient(180deg, #050513 0%, #03030a 45%, #020208 100%);
+  color: #f6f8ff;
 }
 
-.task-panel {
-  margin-top: 16px;
-  padding: 18px;
+.dark-nav {
+  background: transparent;
+  color: #fff;
+}
+
+.dark-nav :deep(.van-nav-bar__title) {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dark-nav :deep(.van-icon) {
+  color: #fff;
+}
+
+.task-hero {
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.task-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .task-id {
-  color: #68738a;
+  color: rgba(216, 221, 241, 0.72);
   font-size: 13px;
 }
 
-.video-panel {
-  margin-top: 16px;
-  padding: 10px;
+.refresh-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 115, 255, 0.55);
+  background: linear-gradient(180deg, rgba(25, 29, 68, 0.95), rgba(12, 13, 31, 0.98));
+  box-shadow: 0 0 18px rgba(143, 70, 255, 0.25);
+  font-size: 28px;
+}
+
+.task-title {
+  margin: 16px 0 0;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 900;
+}
+
+.task-subtitle {
+  margin: 8px 0 0;
+  color: rgba(206, 212, 232, 0.74);
+  font-size: 14px;
+}
+
+.task-progress {
+  margin-top: 18px;
+}
+
+.task-status-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: rgba(229, 235, 255, 0.82);
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #8aa0c8;
+  box-shadow: 0 0 10px rgba(160, 178, 255, 0.25);
+}
+
+.status-dot.queued,
+.status-dot.processing {
+  background: #2f7dff;
+}
+
+.status-dot.done {
+  background: #35ebc8;
+}
+
+.status-dot.failed {
+  background: #ff6b95;
+}
+
+.video-panel,
+.fail-panel {
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.video-frame {
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 video {
   display: block;
   width: 100%;
-  border-radius: 6px;
-  background: #000000;
+  border: 0;
+  background: #000;
 }
 
 .download-button {
   margin-top: 12px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff33dc 0%, #8f34ff 42%, #2f4eff 100%);
+  border: none;
 }
 
-.error-message {
-  max-width: 320px;
-  margin: 0 auto 14px;
-  color: #68738a;
-  font-size: 13px;
+.fail-title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.fail-message {
+  margin: 10px 0 16px;
+  color: rgba(206, 212, 232, 0.74);
+  font-size: 14px;
   line-height: 1.6;
   word-break: break-word;
 }
