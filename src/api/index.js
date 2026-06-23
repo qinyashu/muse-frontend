@@ -39,3 +39,10 @@ export function getTaskStatus(taskId) {
     params: { task_id: taskId },
   })
 }
+
+// 查询当前设备的真实创作记录，历史页只展示后端返回的任务
+export function getTaskList(deviceId) {
+  return request.get('/api/task/list', {
+    params: { device_id: deviceId },
+  })
+}
