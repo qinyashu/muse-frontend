@@ -9,7 +9,8 @@ import { getDeviceId } from '../utils/device'
 const route = useRoute()
 const router = useRouter()
 
-const fileList = ref([])
+const photoList = ref([])
+const videoList = ref([])
 const douyinUrl = ref('')
 const isSubmitting = ref(false)
 
@@ -27,7 +28,8 @@ async function submitTask() {
     return
   }
 
-  const photoFile = fileList.value[0]?.file
+  const photoFile = photoList.value[0]?.file
+  const sourceVideoFile = videoList.value[0]?.file || null
   const cleanDouyinUrl = douyinUrl.value.trim()
 
   if (!photoFile) {
@@ -35,14 +37,20 @@ async function submitTask() {
     return
   }
 
-  if (!cleanDouyinUrl) {
-    showToast('请粘贴抖音链接')
+  if (!cleanDouyinUrl && !sourceVideoFile) {
+    showToast('请粘贴抖音链接或上传源视频')
     return
   }
 
   try {
     isSubmitting.value = true
-    const response = await createTask(getDeviceId(), type.value, cleanDouyinUrl, photoFile)
+    const response = await createTask(
+      getDeviceId(),
+      type.value,
+      cleanDouyinUrl,
+      photoFile,
+      sourceVideoFile,
+    )
     showToast('任务已提交')
     router.push(`/task/${response.data.task_id}`)
   } catch (error) {
@@ -58,12 +66,12 @@ async function submitTask() {
     <van-nav-bar title="创建任务" left-arrow @click-left="router.back()" />
 
     <h1 class="page-title">{{ pageTitle }}</h1>
-    <p class="page-subtitle">上传一张清晰照片，再粘贴抖音链接。</p>
+    <p class="page-subtitle">上传一张清晰照片，再粘贴抖音链接或上传本地视频。</p>
 
     <section class="panel upload-panel">
       <div class="section-title">照片</div>
       <van-uploader
-        v-model="fileList"
+        v-model="photoList"
         :max-count="1"
         accept="image/*"
         preview-size="112"
@@ -78,6 +86,16 @@ async function submitTask() {
         type="textarea"
         label="抖音链接"
         placeholder="粘贴抖音分享链接"
+      />
+    </section>
+
+    <section class="panel upload-panel video-panel">
+      <div class="section-title">源视频</div>
+      <van-uploader
+        v-model="videoList"
+        :max-count="1"
+        accept="video/*"
+        preview-size="112"
       />
     </section>
 
@@ -114,6 +132,10 @@ async function submitTask() {
   margin-top: 14px;
   padding: 4px 0;
   overflow: hidden;
+}
+
+.video-panel {
+  margin-top: 14px;
 }
 
 .submit-button {

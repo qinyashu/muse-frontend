@@ -11,6 +11,7 @@ const router = useRouter()
 const taskId = computed(() => route.params.id)
 const status = ref('queued')
 const outputUrl = ref('')
+const errorMessage = ref('')
 const isPolling = ref(false)
 let timer = null
 
@@ -47,6 +48,7 @@ async function loadStatus() {
     const response = await getTaskStatus(taskId.value)
     status.value = response.data.status
     outputUrl.value = response.data.output_url || ''
+    errorMessage.value = response.data.error_message || ''
 
     if (['done', 'failed'].includes(status.value)) {
       stopPolling()
@@ -110,6 +112,7 @@ onUnmounted(() => {
     </section>
 
     <van-empty v-if="status === 'failed'" description="生成失败，请重试">
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <van-button round type="primary" to="/">重新创建</van-button>
     </van-empty>
   </div>
@@ -144,5 +147,14 @@ video {
 
 .download-button {
   margin-top: 12px;
+}
+
+.error-message {
+  max-width: 320px;
+  margin: 0 auto 14px;
+  color: #68738a;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-word;
 }
 </style>

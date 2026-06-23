@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-// 后端地址从 Vite 环境变量读取，未配置时默认连接本地 FastAPI。
+// 后端地址从 Vite 环境变量读取，未配置时连接本地 FastAPI。
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8000',
   timeout: 30000,
@@ -18,13 +18,17 @@ export function getUserInfo(deviceId) {
   })
 }
 
-// 创建生成任务，使用 multipart/form-data 上传照片。
-export function createTask(deviceId, type, douyinUrl, photoFile) {
+// 创建生成任务；sourceVideoFile 可选，用于抖音解析失败时上传本地视频兜底。
+export function createTask(deviceId, type, douyinUrl, photoFile, sourceVideoFile = null) {
   const formData = new FormData()
   formData.append('device_id', deviceId)
   formData.append('type', type)
-  formData.append('douyin_url', douyinUrl)
+  formData.append('douyin_url', douyinUrl || '')
   formData.append('photo', photoFile)
+
+  if (sourceVideoFile) {
+    formData.append('source_video', sourceVideoFile)
+  }
 
   return request.post('/api/task/create', formData)
 }
