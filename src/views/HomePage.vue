@@ -7,7 +7,6 @@ import { getUserInfo, registerUser } from '../api'
 import { getDeviceId } from '../utils/device'
 
 const router = useRouter()
-
 const remainingCount = ref(0)
 
 async function syncUser() {
@@ -49,8 +48,8 @@ onMounted(() => {
       <img class="home-reference" src="/home-reference.jpg" alt="星速AI 首页预览" draggable="false" />
 
       <div class="hotspots">
+        <div class="cta-cover" aria-hidden="true"></div>
         <button class="hotspot vip-hotspot" type="button" aria-label="VIP 会员" @click="handleVip" />
-        <button class="hotspot cta-hotspot" type="button" aria-label="立即创作" @click="goCreate('sing')" />
         <button class="hotspot sing-hotspot" type="button" aria-label="AI唱歌MV" @click="goCreate('sing')" />
         <button class="hotspot dance-hotspot" type="button" aria-label="AI跳舞MV" @click="goCreate('dance')" />
         <button class="hotspot more-hotspot" type="button" aria-label="查看更多热门作品" @click="goHistory" />
@@ -96,8 +95,25 @@ onMounted(() => {
   inset: 0;
 }
 
+.cta-cover {
+  position: absolute;
+  z-index: 1;
+  top: 19.1%;
+  left: 13.8%;
+  width: 72.4%;
+  height: 11.6%;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 18% 35%, rgba(112, 69, 255, 0.18), transparent 38%),
+    radial-gradient(circle at 82% 32%, rgba(34, 222, 255, 0.16), transparent 36%),
+    linear-gradient(135deg, rgba(8, 8, 26, 0.98), rgba(6, 7, 20, 0.98));
+  box-shadow: 0 0 26px rgba(3, 4, 18, 0.5);
+  pointer-events: none;
+}
+
 .hotspot {
   position: absolute;
+  z-index: 2;
   display: block;
   padding: 0;
   border: 0;
@@ -114,7 +130,6 @@ onMounted(() => {
 }
 
 .vip-hotspot { top: 1.8%; right: 2.1%; width: 17.8%; height: 4.2%; }
-.cta-hotspot { top: 19.6%; left: 15.3%; width: 69.6%; height: 10.4%; }
 .sing-hotspot { top: 30.2%; left: 6.9%; width: 86.6%; height: 18.9%; }
 .dance-hotspot { top: 49.0%; left: 6.9%; width: 86.6%; height: 18.9%; }
 .more-hotspot { top: 66.9%; right: 2.6%; width: 22.5%; height: 4.6%; }
