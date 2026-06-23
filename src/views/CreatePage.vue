@@ -15,21 +15,13 @@ const isSubmitting = ref(false)
 
 const type = computed(() => (route.query.type === 'dance' ? 'dance' : 'sing'))
 
-const pageMeta = computed(() =>
-  type.value === 'dance'
-    ? {
-        title: 'AI跳舞MV',
-        hero: '/ref-create-dance.jpg',
-        tips: '上传一张清晰照片，再粘贴抖音链接，AI为你生成专属舞蹈MV大片',
-        buttonClass: 'dance',
-      }
-    : {
-        title: 'AI唱歌MV',
-        hero: '/ref-create-sing.jpg',
-        tips: '上传一张清晰照片，再粘贴抖音链接，AI为你生成专属演唱MV大片',
-        buttonClass: 'sing',
-      },
+const pageImage = computed(() =>
+  type.value === 'dance' ? '/ref-create-dance.jpg' : '/ref-create-sing.jpg',
 )
+
+function handlePhotoReady() {
+  showToast('照片已上传')
+}
 
 async function submitTask() {
   if (isSubmitting.value) return
@@ -61,334 +53,151 @@ async function submitTask() {
 </script>
 
 <template>
-  <div class="page create-page">
-    <van-nav-bar class="dark-nav" title="创建任务" left-arrow @click-left="router.back()" />
+  <div class="create-screen" :class="type">
+    <figure class="create-stage">
+      <img class="reference-page" :src="pageImage" alt="创建任务" draggable="false" />
 
-    <section class="hero">
-      <img class="hero-image" :src="pageMeta.hero" :alt="pageMeta.title" />
-      <div class="hero-mask">
-        <h1 class="hero-title">{{ pageMeta.title }}</h1>
-        <p class="hero-desc">{{ pageMeta.tips }}</p>
-      </div>
-    </section>
+      <button class="hotspot back-hotspot" type="button" aria-label="返回" @click="router.back()" />
 
-    <section class="panel neon-panel upload-panel">
-      <div class="panel-title-row">
-        <h2 class="panel-title">照片</h2>
-        <span class="panel-icon">i</span>
-      </div>
       <van-uploader
         v-model="photoList"
-        class="photo-uploader"
+        class="upload-hotspot"
         :max-count="1"
         accept="image/*"
-        preview-size="100%"
+        :after-read="handlePhotoReady"
       >
-        <div class="upload-placeholder">
-          <div class="upload-camera">📷</div>
-          <div class="upload-main">点击上传清晰照片</div>
-          <div class="upload-sub">支持 JPG / PNG 格式</div>
-        </div>
+        <button class="upload-hit" type="button" aria-label="上传照片" />
       </van-uploader>
-    </section>
 
-    <section class="panel neon-panel field-panel">
-      <div class="panel-title-row">
-        <h2 class="panel-title">抖音链接</h2>
-        <span class="panel-icon">i</span>
-      </div>
-      <van-field
+      <textarea
         v-model="douyinUrl"
-        class="dark-field"
-        type="textarea"
+        class="douyin-input"
         rows="1"
-        autosize
-        placeholder="粘贴抖音分享链接"
-      >
-        <template #right-icon>
-          <span class="link-icon">🔗</span>
-        </template>
-      </van-field>
-    </section>
+        aria-label="抖音链接"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
 
-    <section class="panel neon-panel tips-panel">
-      <div class="tips-title">💡 小贴士</div>
-      <p>照片越清晰，生成效果越好哦~</p>
-      <p>建议使用正面清晰照，效果更佳！</p>
-      <div class="tips-planet">🪐</div>
-    </section>
-
-    <van-button
-      class="generate-button"
-      :class="pageMeta.buttonClass"
-      block
-      round
-      :loading="isSubmitting"
-      @click="submitTask"
-    >
-      立即生成 ✨
-    </van-button>
-
-    <div class="footer-note">生成内容仅自己可见，请放心使用</div>
+      <button
+        class="hotspot submit-hotspot"
+        type="button"
+        aria-label="立即生成"
+        :disabled="isSubmitting"
+        @click="submitTask"
+      />
+    </figure>
   </div>
 </template>
 
 <style scoped>
-.create-page {
+.create-screen {
   min-height: 100dvh;
-  padding: 0 16px 24px;
-  background:
-    radial-gradient(circle at top right, rgba(92, 56, 255, 0.24), transparent 26%),
-    radial-gradient(circle at top left, rgba(0, 210, 255, 0.15), transparent 22%),
-    linear-gradient(180deg, #050513 0%, #04040d 36%, #020208 100%);
-  color: #f6f8ff;
+  background: #020208;
+  overflow-x: hidden;
 }
 
-.dark-nav {
-  background: transparent;
-  color: #fff;
-}
-
-.dark-nav :deep(.van-nav-bar__title) {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.dark-nav :deep(.van-icon) {
-  color: #fff;
-}
-
-.hero {
+.create-stage {
   position: relative;
-  margin: 10px 0 14px;
-  border-radius: 24px;
-  overflow: hidden;
+  margin: 0;
+  line-height: 0;
 }
 
-.hero-image {
+.reference-page {
   display: block;
   width: 100%;
   height: auto;
-}
-
-.hero-mask {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 18px 16px 14px;
-  background: linear-gradient(180deg, rgba(3, 3, 12, 0.08) 0%, rgba(3, 3, 12, 0.14) 100%);
-}
-
-.hero-title {
-  margin: 0;
-  width: min(74%, 330px);
-  font-size: clamp(26px, 7.4vw, 32px);
-  line-height: 1.05;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.12);
-}
-
-.hero-desc {
-  margin: 14px 0 0;
-  width: min(84%, 340px);
-  color: rgba(243, 246, 255, 0.92);
-  font-size: 15px;
-  line-height: 1.65;
-}
-
-.neon-panel {
-  position: relative;
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 22px;
-  border: 1px solid rgba(146, 101, 255, 0.34);
-  background: linear-gradient(180deg, rgba(17, 18, 42, 0.94), rgba(11, 12, 28, 0.98));
-  box-shadow:
-    inset 0 0 0 1px rgba(103, 154, 255, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    0 16px 36px rgba(0, 0, 0, 0.42);
-}
-
-.neon-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 92, 221, 0.72), rgba(58, 237, 255, 0.66));
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
+  user-select: none;
+  -webkit-user-drag: none;
   pointer-events: none;
-  opacity: 0.78;
 }
 
-.panel-title-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.panel-title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 800;
-  color: #fff;
-}
-
-.panel-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(183, 192, 255, 0.26);
-  color: rgba(235, 240, 255, 0.72);
-  font-size: 16px;
-}
-
-.photo-uploader {
-  width: 100%;
-}
-
-.photo-uploader :deep(.van-uploader__wrapper) {
-  width: 100%;
-}
-
-.photo-uploader :deep(.van-uploader__input-wrapper) {
-  width: 100%;
-}
-
-.photo-uploader :deep(.van-uploader__preview) {
-  width: 100%;
-  margin: 0;
-}
-
-.upload-placeholder {
-  display: flex;
-  min-height: 196px;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 18px;
-  border: 1px dashed rgba(147, 161, 210, 0.28);
-  background: rgba(7, 10, 28, 0.62);
-}
-
-.upload-camera {
-  font-size: 34px;
-  line-height: 1;
-}
-
-.upload-main {
-  font-size: 18px;
-  font-weight: 700;
-  color: #f5f7ff;
-}
-
-.upload-sub {
-  font-size: 13px;
-  color: rgba(189, 196, 223, 0.76);
-}
-
-.field-panel {
-  overflow: hidden;
-}
-
-.dark-field {
-  position: relative;
-  z-index: 1;
-  padding: 0;
-  background: transparent;
-}
-
-.dark-field :deep(.van-cell) {
-  padding: 14px 18px;
-  background: rgba(7, 10, 28, 0.84);
-  border-radius: 16px;
-  color: #f5f7ff;
-}
-
-.dark-field :deep(.van-field__control) {
-  color: #fff;
-}
-
-.dark-field :deep(.van-field__control::placeholder) {
-  color: rgba(171, 180, 205, 0.7);
-}
-
-.link-icon {
-  font-size: 22px;
-  line-height: 1;
-  filter: drop-shadow(0 0 10px rgba(55, 230, 255, 0.5));
-}
-
-.tips-panel {
-  min-height: 120px;
-  overflow: hidden;
-}
-
-.tips-title {
-  position: relative;
-  z-index: 1;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.tips-panel p {
-  position: relative;
-  z-index: 1;
-  margin: 8px 0 0;
-  max-width: 72%;
-  font-size: 15px;
-  line-height: 1.7;
-  color: rgba(238, 242, 255, 0.88);
-}
-
-.tips-planet {
+.hotspot,
+.upload-hotspot,
+.douyin-input {
   position: absolute;
-  right: 18px;
-  bottom: 18px;
-  font-size: 42px;
+  z-index: 2;
 }
 
-.generate-button {
-  margin-top: 18px;
-  height: 58px;
-  border: none;
-  font-size: 18px;
-  font-weight: 800;
-  color: #fff;
-  box-shadow: 0 12px 26px rgba(22, 144, 255, 0.28);
+.hotspot,
+.upload-hit {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.generate-button.sing {
-  background: linear-gradient(90deg, #ff33dc 0%, #8f34ff 42%, #2f4eff 100%);
+.back-hotspot {
+  top: 1.5%;
+  left: 2.8%;
+  width: 10%;
+  height: 5.5%;
 }
 
-.generate-button.dance {
-  background: linear-gradient(90deg, #0ee6ef 0%, #2e92ff 42%, #34f5cd 100%);
+.upload-hotspot {
+  left: 9.5%;
+  width: 81%;
+  height: 17.8%;
+  opacity: 0.01;
 }
 
-.footer-note {
-  margin-top: 12px;
-  text-align: center;
-  color: rgba(172, 179, 203, 0.74);
-  font-size: 13px;
+.sing .upload-hotspot {
+  top: 33.4%;
+}
+
+.dance .upload-hotspot {
+  top: 37.6%;
+}
+
+.upload-hit,
+.upload-hotspot :deep(.van-uploader__wrapper),
+.upload-hotspot :deep(.van-uploader__input-wrapper) {
+  width: 100%;
+  height: 100%;
+}
+
+.upload-hotspot :deep(.van-uploader__preview) {
+  display: none;
+}
+
+.douyin-input {
+  left: 11.5%;
+  width: 70%;
+  min-height: 5.2%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: rgba(238, 243, 255, 0.96);
+  font-size: clamp(13px, 3.8vw, 17px);
+  line-height: 1.35;
+}
+
+.sing .douyin-input {
+  top: 62.0%;
+}
+
+.dance .douyin-input {
+  top: 65.8%;
+}
+
+.submit-hotspot {
+  left: 6.5%;
+  width: 87%;
+  height: 7.8%;
+  border-radius: 999px;
+}
+
+.sing .submit-hotspot {
+  top: 86.7%;
+}
+
+.dance .submit-hotspot {
+  top: 87.7%;
 }
 </style>
