@@ -45,10 +45,9 @@ onMounted(() => {
 <template>
   <div class="home-screen">
     <figure class="home-stage">
-      <img class="home-reference" src="/home-reference.jpg" alt="星速AI 首页预览" draggable="false" />
+      <img class="home-reference" src="/home-reference.jpg" alt="星速AI 首页" draggable="false" />
 
       <div class="hotspots">
-        <div class="cta-cover" aria-hidden="true"></div>
         <button class="hotspot vip-hotspot" type="button" aria-label="VIP 会员" @click="handleVip" />
         <button class="hotspot sing-hotspot" type="button" aria-label="AI唱歌MV" @click="goCreate('sing')" />
         <button class="hotspot dance-hotspot" type="button" aria-label="AI跳舞MV" @click="goCreate('dance')" />
@@ -93,27 +92,6 @@ onMounted(() => {
 .hotspots {
   position: absolute;
   inset: 0;
-}
-
-.cta-cover {
-  position: absolute;
-  z-index: 1;
-  top: 19.2%;
-  left: 10.4%;
-  width: 79.2%;
-  height: 11.3%;
-  border-radius: 34px;
-  background:
-    radial-gradient(ellipse at 16% 18%, rgba(112, 54, 218, 0.58), transparent 44%),
-    radial-gradient(ellipse at 84% 18%, rgba(15, 173, 211, 0.38), transparent 46%),
-    radial-gradient(ellipse at 50% 112%, rgba(44, 39, 126, 0.32), transparent 56%),
-    linear-gradient(180deg, rgba(9, 12, 43, 0.78), rgba(4, 7, 26, 0.9));
-  box-shadow:
-    inset 0 0 34px rgba(8, 11, 33, 0.58),
-    0 0 18px rgba(6, 10, 31, 0.36);
-  backdrop-filter: blur(16px) saturate(1.28);
-  -webkit-backdrop-filter: blur(16px) saturate(1.28);
-  pointer-events: none;
 }
 
 .hotspot {
