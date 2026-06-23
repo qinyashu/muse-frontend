@@ -98,16 +98,21 @@ onMounted(() => {
 .cta-cover {
   position: absolute;
   z-index: 1;
-  top: 19.1%;
-  left: 13.8%;
-  width: 72.4%;
-  height: 11.6%;
-  border-radius: 24px;
+  top: 19.2%;
+  left: 10.4%;
+  width: 79.2%;
+  height: 11.3%;
+  border-radius: 34px;
   background:
-    radial-gradient(circle at 18% 35%, rgba(112, 69, 255, 0.18), transparent 38%),
-    radial-gradient(circle at 82% 32%, rgba(34, 222, 255, 0.16), transparent 36%),
-    linear-gradient(135deg, rgba(8, 8, 26, 0.98), rgba(6, 7, 20, 0.98));
-  box-shadow: 0 0 26px rgba(3, 4, 18, 0.5);
+    radial-gradient(ellipse at 16% 18%, rgba(112, 54, 218, 0.58), transparent 44%),
+    radial-gradient(ellipse at 84% 18%, rgba(15, 173, 211, 0.38), transparent 46%),
+    radial-gradient(ellipse at 50% 112%, rgba(44, 39, 126, 0.32), transparent 56%),
+    linear-gradient(180deg, rgba(9, 12, 43, 0.78), rgba(4, 7, 26, 0.9));
+  box-shadow:
+    inset 0 0 34px rgba(8, 11, 33, 0.58),
+    0 0 18px rgba(6, 10, 31, 0.36);
+  backdrop-filter: blur(16px) saturate(1.28);
+  -webkit-backdrop-filter: blur(16px) saturate(1.28);
   pointer-events: none;
 }
 
