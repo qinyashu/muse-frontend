@@ -27,8 +27,8 @@ const progress = computed(() => {
 
 const statusText = computed(() => {
   const map = {
-    queued: '排队中，请稍候...',
-    processing: 'AI 生成中，预计需要1-2分钟...',
+    queued: '排队中，请稍等...',
+    processing: 'AI 生成中，预计需要 1-2 分钟...',
     done: '生成完成',
     failed: '生成失败，请重试',
   }
@@ -81,189 +81,108 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="page task-page">
-    <van-nav-bar class="dark-nav" title="任务详情" left-arrow @click-left="router.back()" />
+  <div class="mobile-page task-page">
+    <van-nav-bar class="page-nav" title="任务详情" left-arrow @click-left="router.back()" />
 
-    <section class="task-hero panel neon-panel">
-      <div class="task-head">
-        <div class="task-id">任务 #{{ taskId }}</div>
-        <div class="refresh-badge">⟳</div>
-      </div>
-      <h1 class="task-title">{{ statusText }}</h1>
-      <p class="task-subtitle">{{ isPolling ? '正在刷新状态...' : '状态会自动更新' }}</p>
+    <main class="page-body task-body">
+      <section class="status-card app-card">
+        <span class="task-id">任务 #{{ taskId }}</span>
+        <h1>{{ statusText }}</h1>
+        <p>{{ isPolling ? '正在刷新状态...' : '状态会自动更新' }}</p>
 
-      <van-progress
-        v-if="status === 'queued' || status === 'processing'"
-        class="task-progress"
-        :percentage="progress"
-        stroke-width="10"
-        track-color="rgba(46, 52, 81, 0.92)"
-      />
+        <van-progress
+          v-if="status === 'queued' || status === 'processing'"
+          class="task-progress"
+          :percentage="progress"
+          stroke-width="8"
+          color="#667eea"
+          track-color="#eef0f6"
+        />
+      </section>
 
-      <div class="task-status-block">
-        <span class="status-dot" :class="status"></span>
-        <span>{{ status === 'done' ? '已完成' : status === 'failed' ? '已失败' : '进行中' }}</span>
-      </div>
-    </section>
+      <section v-if="status === 'done'" class="result-card app-card">
+        <video v-if="outputUrl" class="result-video" controls playsinline :src="outputUrl"></video>
+        <button class="primary-action" type="button" @click="downloadVideo">保存视频</button>
+      </section>
 
-    <section v-if="status === 'done' && outputUrl" class="panel neon-panel video-panel">
-      <div class="video-frame">
-        <video :src="outputUrl" controls playsinline preload="metadata"></video>
-      </div>
-      <van-button class="download-button" block round type="primary" @click="downloadVideo">
-        下载视频
-      </van-button>
-    </section>
-
-    <section v-if="status === 'failed'" class="panel neon-panel fail-panel">
-      <div class="fail-title">生成失败，请重试</div>
-      <p v-if="errorMessage" class="fail-message">{{ errorMessage }}</p>
-      <van-button round type="primary" to="/">返回首页</van-button>
-    </section>
+      <section v-else-if="status === 'failed'" class="result-card app-card">
+        <van-icon class="failed-icon" name="warning-o" />
+        <strong>任务生成失败</strong>
+        <p>{{ errorMessage || '请检查抖音链接、模型服务或稍后重试。' }}</p>
+        <button class="primary-action" type="button" @click="router.push('/create?type=sing')">重新创作</button>
+      </section>
+    </main>
   </div>
 </template>
 
 <style scoped>
-.task-page {
-  min-height: 100dvh;
-  padding: 0 16px 24px;
-  background:
-    radial-gradient(circle at top right, rgba(92, 56, 255, 0.2), transparent 22%),
-    radial-gradient(circle at top left, rgba(0, 210, 255, 0.12), transparent 20%),
-    linear-gradient(180deg, #050513 0%, #03030a 45%, #020208 100%);
-  color: #f6f8ff;
-}
-
-.dark-nav {
-  background: transparent;
-  color: #fff;
-}
-
-.dark-nav :deep(.van-nav-bar__title) {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.dark-nav :deep(.van-icon) {
-  color: #fff;
-}
-
-.task-hero {
-  margin-top: 12px;
-  padding: 16px;
-}
-
-.task-head {
+.task-body {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-card {
+  min-height: 170px;
+  background:
+    radial-gradient(circle at 86% 20%, rgba(102, 126, 234, 0.16), transparent 28%),
+    #ffffff;
 }
 
 .task-id {
-  color: rgba(216, 221, 241, 0.72);
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(102, 126, 234, 0.12);
+  color: var(--app-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-card h1 {
+  margin: 20px 0 8px;
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.status-card p {
+  margin: 0;
+  color: var(--app-muted);
   font-size: 13px;
 }
 
-.refresh-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 115, 255, 0.55);
-  background: linear-gradient(180deg, rgba(25, 29, 68, 0.95), rgba(12, 13, 31, 0.98));
-  box-shadow: 0 0 18px rgba(143, 70, 255, 0.25);
-  font-size: 28px;
-}
-
-.task-title {
-  margin: 16px 0 0;
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: 900;
-}
-
-.task-subtitle {
-  margin: 8px 0 0;
-  color: rgba(206, 212, 232, 0.74);
-  font-size: 14px;
-}
-
 .task-progress {
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
-.task-status-block {
+.result-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  color: rgba(229, 235, 255, 0.82);
-  font-size: 14px;
+  gap: 14px;
+  text-align: center;
 }
 
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #8aa0c8;
-  box-shadow: 0 0 10px rgba(160, 178, 255, 0.25);
-}
-
-.status-dot.queued,
-.status-dot.processing {
-  background: #2f7dff;
-}
-
-.status-dot.done {
-  background: #35ebc8;
-}
-
-.status-dot.failed {
-  background: #ff6b95;
-}
-
-.video-panel,
-.fail-panel {
-  margin-top: 14px;
-  padding: 14px;
-}
-
-.video-frame {
-  border-radius: 18px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-video {
-  display: block;
+.result-video {
   width: 100%;
-  border: 0;
-  background: #000;
+  max-height: 420px;
+  border-radius: 12px;
+  background: #101323;
 }
 
-.download-button {
-  margin-top: 12px;
-  height: 52px;
-  font-size: 16px;
-  font-weight: 800;
-  background: linear-gradient(90deg, #ff33dc 0%, #8f34ff 42%, #2f4eff 100%);
-  border: none;
+.failed-icon {
+  color: #ef4444;
+  font-size: 44px;
 }
 
-.fail-title {
-  font-size: 22px;
-  font-weight: 800;
+.result-card strong {
+  font-size: 18px;
 }
 
-.fail-message {
-  margin: 10px 0 16px;
-  color: rgba(206, 212, 232, 0.74);
-  font-size: 14px;
+.result-card p {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 13px;
   line-height: 1.6;
-  word-break: break-word;
 }
 </style>
