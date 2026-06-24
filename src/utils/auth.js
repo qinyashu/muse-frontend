@@ -36,4 +36,6 @@ export function clearAuth() {
   localStorage.removeItem(AUTH_KEY)
   localStorage.removeItem(PHONE_KEY)
   localStorage.removeItem(UNLIMITED_KEY)
+  localStorage.removeItem('device_id')
+  localStorage.removeItem('muse_vip_mark')
 }

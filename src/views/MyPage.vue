@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showConfirmDialog, showToast } from 'vant'
 
 import BottomNav from '../components/BottomNav.vue'
+import { clearAuth } from '../utils/auth'
 
 const router = useRouter()
 
@@ -47,6 +48,12 @@ const menuItems = [
     value: 'v7.1.9',
     action: () => showToast('当前版本 v7.1.9'),
   },
+  {
+    key: 'logout',
+    label: '退出登录',
+    icon: 'revoke',
+    action: handleLogout,
+  },
 ]
 
 function handleAvatarRead(fileItem) {
@@ -88,6 +95,20 @@ function saveName() {
 function cancelEditName() {
   draftName.value = profileName.value
   isEditingName.value = false
+}
+
+function handleLogout() {
+  showConfirmDialog({
+    title: '退出登录',
+    message: '是否退出当前账户',
+    confirmButtonText: '是',
+    cancelButtonText: '否',
+  })
+    .then(() => {
+      clearAuth()
+      router.replace('/login')
+    })
+    .catch(() => {})
 }
 </script>
 
