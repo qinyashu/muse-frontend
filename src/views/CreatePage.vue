@@ -81,9 +81,9 @@ async function submitTask() {
     <main class="page-body create-body">
       <section class="mode-card app-card" :class="type">
         <div>
-          <span>当前创作模式</span>
-          <strong><span class="ai-text" translate="no">AI</span>{{ titleSuffix }}</strong>
-          <p>{{ subtitle }}<span class="ai-text" translate="no">AI</span> 会自动处理素材并生成专属 MV。</p>
+          <span class="mode-label">当前创作模式</span>
+          <strong class="mode-title"><span class="ai-text" translate="no">AI</span>{{ titleSuffix }}</strong>
+          <p class="mode-description">{{ subtitle }}<span class="ai-text" translate="no">AI</span> 会自动处理素材并生成专属 MV。</p>
         </div>
         <span class="mode-icon">
           <van-icon :name="type === 'dance' ? 'fire-o' : 'music-o'" />
@@ -179,6 +179,7 @@ async function submitTask() {
 
 .mode-card {
   display: grid;
+  min-height: 116px;
   grid-template-columns: minmax(0, 1fr) 64px;
   align-items: center;
   gap: 12px;
@@ -188,24 +189,30 @@ async function submitTask() {
     #ffffff;
 }
 
-.mode-card span {
+.mode-label {
+  display: block;
   color: var(--app-muted);
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.2;
 }
 
-.mode-card strong {
+.mode-title {
   display: block;
   margin-top: 4px;
   font-size: 22px;
   line-height: 1.2;
 }
 
-.mode-card p {
+.mode-description {
+  display: -webkit-box;
+  overflow: hidden;
   margin: 8px 0 0;
   color: var(--app-muted);
   font-size: 13px;
   line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .mode-icon {

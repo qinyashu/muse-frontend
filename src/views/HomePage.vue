@@ -120,7 +120,7 @@ onMounted(() => {
 
       <section class="hero-card app-card">
         <div class="hero-copy">
-          <span>一键生成专属<span class="ai-text" translate="no">AI</span>大片</span>
+          <span class="hero-eyebrow">一键生成专属<span class="ai-text" translate="no">AI</span>大片</span>
           <h1>星速<span class="ai-text" translate="no">AI</span>创作</h1>
           <p>上传照片，粘贴抖音链接或上传本地视频，快速生成唱歌或跳舞 MV。</p>
         </div>
@@ -267,15 +267,23 @@ onMounted(() => {
   max-width: 72%;
 }
 
-.hero-copy span {
+.hero-eyebrow {
+  display: block;
   color: rgba(255, 255, 255, 0.72);
   font-size: 12px;
+  line-height: 1.3;
 }
 
 .hero-copy h1 {
   margin: 7px 0 8px;
   font-size: 28px;
   line-height: 1.12;
+}
+
+.hero-copy h1 .ai-text {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 
 .hero-copy p {
