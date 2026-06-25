@@ -38,7 +38,9 @@ export function createTask(deviceId, type, douyinUrl, photoFile, sourceVideoFile
     formData.append('source_video', sourceVideoFile)
   }
 
-  return request.post('/api/task/create', formData)
+  return request.post('/api/task/create', formData, {
+    timeout: 600000,
+  })
 }
 
 export function getTaskStatus(taskId) {
